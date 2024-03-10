@@ -1,21 +1,19 @@
-import discord, boto3
+import discord, boto3, os
+from dotenv import load_dotenv
 
+# Load Environment Variables
+load_dotenv();
+INSTANCE_ID = os.getenv("INSTANCE_ID");
+DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN");
+
+# Setup Discord 
 intents = discord.Intents.default()
 intents.message_content = True
-#intents.members = True
-
 client = discord.Client(intents=intents)
 
-# Grabbing credentials from file creds.txt
-with open('creds.txt', 'r') as file:
-    data = file.readlines()
-    file.close()
-
-instance_id = data[0].replace('instance_id = ', '').replace('\n', '')
-discord_bot_token = data[1].replace('discord_bot_token = ', '').replace('\n', '')
-
+# Setup AWS EC2 Instance
 ec2 = boto3.resource('ec2')
-instance = ec2.Instance(instance_id)
+instance = ec2.Instance(INSTANCE_ID)
 
 @client.event
 async def on_ready():
@@ -99,4 +97,4 @@ def reboot_instance():
         return False
 
 
-client.run(discord_bot_token)
+client.run(DISCORD_BOT_TOKEN)
